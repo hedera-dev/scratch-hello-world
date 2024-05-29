@@ -27,10 +27,10 @@
     - [ ] 02-hscs-smart-contract-sdk --> Note: **Not** using EthersJs
     - [ ] 04-hts-ft-sdk
     - [ ] 06-hcs-topic
-- [ ] golang
+- [x] golang
     - [x] 00-create-fund-account
     - [x] 01-hfs-files-sdk
-    - [ ] 02-hscs-smart-contract-sdk --> Note: **Not** using EthersJs
+    - [x] 02-hscs-smart-contract-sdk --> Note: **Not** using EthersJs
     - [x] 04-hts-ft-sdk
     - [x] 06-hcs-topic
 
