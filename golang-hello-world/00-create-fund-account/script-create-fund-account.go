@@ -3,13 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/hashgraph/hedera-sdk-go/v2"
+	"github.com/imroc/req/v3"
 	"github.com/joho/godotenv"
 	"github.com/shopspring/decimal"
 	bip32 "github.com/tyler-smith/go-bip32"
@@ -74,29 +73,23 @@ func main() {
 	var accountId string
 	var accountBalanceTinybar int64
 	var accountBalanceHbar string
-	httpResp, err := http.Get(accountBalanceFetchApiUrl)
+	httpResp, err := req.R().Get(accountBalanceFetchApiUrl)
 	if err != nil {
-		log.Printf("Failed to fetch account balance URL: %v", err)
+		fmt.Printf("Failed to fetch account balance URL: %v", err)
 	} else {
-		defer httpResp.Body.Close()
-		httpRespBody, err := io.ReadAll(httpResp.Body)
+		var accountBalanceResp AccountBalanceResponse
+		err = json.Unmarshal(httpResp.Bytes(), &accountBalanceResp)
 		if err != nil {
-			log.Printf("Failed to read body of response fetched from account balance URL: %v", err)
+			log.Printf("Failed to parse JSON of response fetched from account balance URL: %v", err)
 		} else {
-			var accountBalanceResp AccountBalanceResponse
-			err = json.Unmarshal(httpRespBody, &accountBalanceResp)
-			if err != nil {
-				log.Printf("Failed to parse JSON of response fetched from account balance URL: %v", err)
-			} else {
-				if len(accountBalanceResp.Balances) > 0 {
-					item := accountBalanceResp.Balances[0]
-					accountId = item.Account
-					accountBalanceTinybar = item.Balance
-					accountBalanceHbar = decimal.
-						NewFromInt(accountBalanceTinybar).
-						Div(decimal.NewFromInt(10_000_000)).
-						StringFixed(8)
-				}
+			if len(accountBalanceResp.Balances) > 0 {
+				item := accountBalanceResp.Balances[0]
+				accountId = item.Account
+				accountBalanceTinybar = item.Balance
+				accountBalanceHbar = decimal.
+					NewFromInt(accountBalanceTinybar).
+					Div(decimal.NewFromInt(10_000_000)).
+					StringFixed(8)
 			}
 		}
 	}
