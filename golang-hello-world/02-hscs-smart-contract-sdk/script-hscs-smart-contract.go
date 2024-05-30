@@ -101,7 +101,6 @@ func main() {
 	// Read data from smart contract
 	// NOTE: Invoke a smart contract query
 	// Step (4) in the accompanying tutorial
-	// const [myContractQueryResult] = await /* ... */;
 	//	SetContractID(/* ... */).
 	//	SetGas(100000).
 	//	SetFunction(/* ... */).
