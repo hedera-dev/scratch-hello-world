@@ -1,12 +1,23 @@
 package hscssmartcontract;
 
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.ContractCallQuery;
+import com.hedera.hashgraph.sdk.ContractCreateTransaction;
+import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
+import com.hedera.hashgraph.sdk.ContractFunctionParameters;
+import com.hedera.hashgraph.sdk.ContractFunctionResult;
+import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.FileCreateTransaction;
+import com.hedera.hashgraph.sdk.FileId;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
-
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.concurrent.TimeoutException;
+import java.util.Objects;
 
 public class ScriptHscsSmartContract {
     public static void main(String[] args) throws Exception {
@@ -37,15 +48,15 @@ public class ScriptHscsSmartContract {
             .setContents(evmBytecode)
             .execute(client);
         TransactionReceipt fileReceipt = fileCreateTransaction.getReceipt(client);
-        FileId bytecodeFileId = fileReceipt.fileId;
+        FileId bytecodeFileId = Objects.requireNonNull(fileReceipt.fileId);
 
 	    // Deploy smart contract
         TransactionResponse contractCreateTransaction = new ContractCreateTransaction()
             .setBytecodeFileId(bytecodeFileId)
-            .setGas(100000)
+            .setGas(100_000)
             .execute(client);
         TransactionReceipt contractReceipt = contractCreateTransaction.getReceipt(client);
-        ContractId myContractId = contractReceipt.contractId;
+        ContractId myContractId = Objects.requireNonNull(contractReceipt.contractId);
         String myContractExplorerUrl = "https://hashscan.io/testnet/address/" + myContractId;
 
         // Write data to smart contract
@@ -54,7 +65,7 @@ public class ScriptHscsSmartContract {
         // .setFunction("introduce", new ContractFunctionParameters().addString(/* ... */))
         TransactionResponse contractExecuteTransaction = new ContractExecuteTransaction()
             .setContractId(myContractId)
-            .setGas(100000)
+            .setGas(100_000)
             .setFunction("introduce", new ContractFunctionParameters().addString("bguiz"))
             .execute(client);
         TransactionReceipt executeReceipt = contractExecuteTransaction.getReceipt(client);
@@ -69,7 +80,7 @@ public class ScriptHscsSmartContract {
         //  .setFunction(/* ... */);
         ContractCallQuery contractCallQuery = new ContractCallQuery()
             .setContractId(myContractId)
-            .setGas(100000)
+            .setGas(100_000)
             .setFunction("greet", new ContractFunctionParameters());
         ContractFunctionResult greetResult = contractCallQuery.execute(client);
         String myContractQueryResult = greetResult.getString(0);
