@@ -1,11 +1,18 @@
 package hfsfiles;
 
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.FileContentsQuery;
+import com.hedera.hashgraph.sdk.FileCreateTransaction;
+import com.hedera.hashgraph.sdk.FileId;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
-
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 public class ScriptHfsFiles {
     public static void main(String[] args) throws Exception {
@@ -26,9 +33,9 @@ public class ScriptHfsFiles {
         Client client = Client.forTestnet().setOperator(accountId, accountKey);
 
         // Read file from disk
-        String localFileContents = new String(Files.readAllBytes(Paths.get("my-file.txt")), StandardCharsets.UTF_8);
+        String localFileContents = Files.readString(Paths.get("my-file.txt"));
 
-        // Write file onto Hedera Testnet, using HFS FileCreateTransaction
+        // Write file onto Hedera Testnet, using HFS FileCreateTransaction
         FileCreateTransaction fileCreateTx = new FileCreateTransaction()
             // NOTE: File create transaction
             // Step (1) in the accompanying tutorial
@@ -39,7 +46,7 @@ public class ScriptHfsFiles {
         TransactionResponse fileCreateTxSubmitted = fileCreateTxSigned.execute(client);
         TransactionId fileCreateTxId = fileCreateTxSubmitted.transactionId;
         TransactionReceipt fileCreateTxReceipt = fileCreateTxSubmitted.getReceipt(client);
-        FileId fileId = fileCreateTxReceipt.fileId;
+        FileId fileId = Objects.requireNonNull(fileCreateTxReceipt.fileId);
 
         // Read file from Hedera Testnet, using HFS FileContentsQuery
         FileContentsQuery fileReadQuery = new FileContentsQuery()

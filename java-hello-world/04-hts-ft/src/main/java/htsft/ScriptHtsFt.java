@@ -1,18 +1,21 @@
 package htsft;
 
-import com.hedera.hashgraph.sdk.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenId;
+import com.hedera.hashgraph.sdk.TokenType;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
-import java.util.Scanner;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeoutException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class ScriptHtsFt {
     public static void main(String[] args) throws Exception {
@@ -32,7 +35,6 @@ public class ScriptHtsFt {
         PrivateKey accountKey = PrivateKey.fromStringECDSA(privateKeyStr);
         Client client = Client.forTestnet().setOperator(accountId, accountKey);
 
-        String accountExplorerUrl = "https://hashscan.io/testnet/address/" + accountId;
         // Create the token
         TokenCreateTransaction tokenCreateTx = new TokenCreateTransaction()
             // NOTE: Configure HTS token to be created
@@ -59,8 +61,8 @@ public class ScriptHtsFt {
 
         client.close();
 
-        // Wait for 3 seconds for the record files to be ingested by the mirror nodes
-        Thread.sleep(3000);
+        // Wait for 5 seconds for the record files to be ingested by the mirror nodes
+        Thread.sleep(5000);
 
         // Query token balance of account (mirror node)
         // NOTE: Mirror Node API to query specified token balance
@@ -73,23 +75,19 @@ public class ScriptHtsFt {
             "/tokens?token.id=" +
             tokenId.toString() +
             "&limit=1&order=desc";
-        URL url = URI.create(accountBalanceFetchApiUrl).toURL();
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.connect();
-        int responseCode = conn.getResponseCode();
-        if (responseCode < 200 || responseCode >= 400) {
-            throw new RuntimeException("HTTP response code: " + responseCode);
-        }
-        String inline = "";
-        Scanner scanner = new Scanner(url.openStream());
-        while (scanner.hasNext()) {
-            inline += scanner.nextLine();
-        }
-        scanner.close();
-        JSONObject jsonResponse = new JSONObject(inline);
-        JSONArray tokensArray = jsonResponse.getJSONArray("tokens");
-        long accountBalanceToken = tokensArray.getJSONObject(0).getLong("balance");
+
+        final HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(accountBalanceFetchApiUrl))
+                .build();
+
+        final HttpClient httpClient = HttpClient.newHttpClient();
+
+        final var mirrorNodeResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString()).body();
+
+        JsonObject jsonResponse = JsonParser.parseString(mirrorNodeResponse).getAsJsonObject();
+        JsonArray tokensArray = jsonResponse.getAsJsonArray("tokens");
+        JsonObject balanceObject = tokensArray.get(0).getAsJsonObject();
+        long accountBalanceToken = balanceObject.get("balance").getAsLong();
 
         // Output results
         System.out.println("accountId: " + accountId);

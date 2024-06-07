@@ -11,10 +11,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.hedera.hashgraph:sdk:2.32.0'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
+    implementation 'com.hedera.hashgraph:sdk:2.33.0'
 }
