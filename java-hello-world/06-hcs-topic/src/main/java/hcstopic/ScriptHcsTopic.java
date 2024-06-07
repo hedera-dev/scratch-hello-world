@@ -1,12 +1,15 @@
 package hcstopic;
 
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TopicCreateTransaction;
+import com.hedera.hashgraph.sdk.TopicId;
+import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeoutException;
 
 public class ScriptHcsTopic {
     public static void main(String[] args) throws Exception {
@@ -25,8 +28,6 @@ public class ScriptHcsTopic {
         AccountId accountId = AccountId.fromString(accountIdStr);
         PrivateKey accountKey = PrivateKey.fromStringECDSA(privateKeyStr);
         Client client = Client.forTestnet().setOperator(accountId, accountKey);
-
-        String accountExplorerUrl = "https://hashscan.io/testnet/address/" + accountId;
 
         // NOTE: Create a topic
         // Step (1) in the accompanying tutorial
