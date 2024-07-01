@@ -1,2 +1,5 @@
-.env
 /node_modules
+/rpcrelay
+.env
+.rpcrelay.env
+package-lock.json

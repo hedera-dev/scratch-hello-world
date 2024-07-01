@@ -1,0 +1,44 @@
+# Configuration for gitpod.io
+# Ref: https://www.gitpod.io/docs/introduction/learn-gitpod/gitpod-yaml
+# Ref: https://www.gitpod.io/docs/configure/workspaces/tasks
+tasks:
+  - name: "dockerbackground"
+    openMode: tab-after
+    init: |
+      bash ./init-02-dockerbackground.sh
+  - name: "rpcrelay"
+    openMode: tab-after
+    init: |
+      (
+        set -e
+        gp sync-await setup
+        source .env
+        node ./init-01-rpcrelay-p00.js
+        bash ./init-01-rpcrelay-p01-docker.sh
+        export RPC_URL="$( gp url 7546 )"
+        bash ./init-01-rpcrelay-p02.sh
+        gp sync-done rpcrelay
+      )
+  - name: "setup"
+    openMode: tab-before
+    init: |
+      (
+        set -e
+        npm install
+        cp .env.sample .env
+        export RPC_URL="$( gp url 7546 )"
+        node ./init-00-main.js
+        source .env
+        gp sync-done setup
+      )
+ports:
+  - name: "dapp"
+    description: "DApp"
+    port: 3131
+    onOpen: open-browser
+    visibility: public
+  - name: "rpcrelay"
+    description: "JSON-RPC relay"
+    port: 7546
+    onOpen: notify
+    visibility: public
