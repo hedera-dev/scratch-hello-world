@@ -36,7 +36,9 @@ public class ScriptHscsSmartContract {
             .setKeys(accountKey)
             .setContents(evmBytecode)
             .execute(client);
-        TransactionReceipt fileReceipt = fileCreateTransaction.getReceipt(client);
+        TransactionReceipt fileReceipt = fileCreateTransaction
+            .setValidateStatus(true)
+            .getReceipt(client);
         FileId bytecodeFileId = fileReceipt.fileId;
 
 	    // Deploy smart contract
@@ -44,7 +46,9 @@ public class ScriptHscsSmartContract {
             .setBytecodeFileId(bytecodeFileId)
             .setGas(100000)
             .execute(client);
-        TransactionReceipt contractReceipt = contractCreateTransaction.getReceipt(client);
+        TransactionReceipt contractReceipt = contractCreateTransaction
+            .setValidateStatus(true)
+            .getReceipt(client);
         ContractId myContractId = contractReceipt.contractId;
         String myContractExplorerUrl = "https://hashscan.io/testnet/address/" + myContractId;
 
@@ -57,7 +61,9 @@ public class ScriptHscsSmartContract {
             .setGas(100000)
             .setFunction("introduce", new ContractFunctionParameters().addString("bguiz"))
             .execute(client);
-        TransactionReceipt executeReceipt = contractExecuteTransaction.getReceipt(client);
+        TransactionReceipt executeReceipt = contractExecuteTransaction
+            .setValidateStatus(true)
+            .getReceipt(client);
         TransactionId myContractWriteTxId = executeReceipt.transactionId;
         String myContractWriteTxExplorerUrl = "https://hashscan.io/testnet/transaction/" + myContractWriteTxId;
 

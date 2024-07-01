@@ -54,7 +54,9 @@ func main() {
 		log.Fatalf("Error executing FileCreateTransaction: %v", err)
 	}
 	fileCreateTxId := fileCreateTxSubmitted.TransactionID
-	fileCreateTxReceipt, err := fileCreateTxSubmitted.GetReceipt(client)
+	fileCreateTxReceipt, err := fileCreateTxSubmitted.
+		SetValidateStatus(true).
+		GetReceipt(client)
 	if err != nil {
 		log.Fatalf("Error getting receipt for FileCreateTransaction: %v", err)
 	}

@@ -63,7 +63,9 @@ func main() {
 		log.Fatalf("Error executing TokenCreateTransaction: %v\n", err)
 	}
 
-	tokenCreateTxReceipt, err := tokenCreateTxSubmitted.GetReceipt(client)
+	tokenCreateTxReceipt, err := tokenCreateTxSubmitted.
+		SetValidateStatus(true).
+		GetReceipt(client)
 	if err != nil {
 		log.Fatalf("Error getting receipt for TokenCreateTransaction: %v\n", err)
 	}

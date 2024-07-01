@@ -38,14 +38,13 @@ public class ScriptHcsTopic {
                 .freezeWith(client);
         TopicCreateTransaction topicCreateTxSigned = topicCreateTx.sign(accountKey);
         TransactionResponse topicCreateTxResponse = topicCreateTxSigned.execute(client);
-        TransactionReceipt topicCreateTxReceipt = topicCreateTxResponse.getReceipt(client);
+        TransactionReceipt topicCreateTxReceipt = topicCreateTxResponse
+            .setValidateStatus(true)
+            .getReceipt(client);
         TransactionId topicCreateTxId = topicCreateTxResponse.transactionId;
         TopicId topicId = topicCreateTxReceipt.topicId;
 
         String topicExplorerUrl = "https://hashscan.io/testnet/topic/" + topicId.toString();
-
-        System.out.println("Topic created. Waiting a few seconds for propagation...");
-        Thread.sleep(5000);
 
         // Publish a message to this topic
         // NOTE: Publish message to topic
@@ -61,7 +60,9 @@ public class ScriptHcsTopic {
         TopicMessageSubmitTransaction topicMsgSubmitTxSigned = topicMsgSubmitTx.sign(accountKey);
         TransactionResponse topicMsgSubmitTxResponse = topicMsgSubmitTxSigned.execute(client);
         TransactionId topicMsgSubmitTxId = topicMsgSubmitTxResponse.transactionId;
-        TransactionReceipt topicMsgSubmitTxReceipt = topicMsgSubmitTxResponse.getReceipt(client);
+        TransactionReceipt topicMsgSubmitTxReceipt = topicMsgSubmitTxResponse
+            .setValidateStatus(true)
+            .getReceipt(client);
 
         String topicMessageMirrorUrl =
             "https://testnet.mirrornode.hedera.com/api/v1/topics/" +

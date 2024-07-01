@@ -52,7 +52,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error creating file: %v", err)
 	}
-	fileReceipt, err := fileCreateTransaction.GetReceipt(client)
+	fileReceipt, err := fileCreateTransaction.
+		SetValidateStatus(true).
+		GetReceipt(client)
 	if err != nil {
 		log.Fatalf("Error getting file create receipt: %v", err)
 	}
@@ -66,7 +68,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error creating contract: %v", err)
 	}
-	contractReceipt, err := contractCreateTransaction.GetReceipt(client)
+	contractReceipt, err := contractCreateTransaction.
+		SetValidateStatus(true).
+		GetReceipt(client)
 	if err != nil {
 		log.Fatalf("Error getting contract create receipt: %v", err)
 	}
@@ -88,7 +92,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error executing contract: %v", err)
 	}
-	executeReceipt, err := contractExecuteTransaction.GetReceipt(client)
+	executeReceipt, err := contractExecuteTransaction.
+		SetValidateStatus(true).
+		GetReceipt(client)
 	if err != nil {
 		log.Fatalf("Error getting contract execute receipt: %v", err)
 	}

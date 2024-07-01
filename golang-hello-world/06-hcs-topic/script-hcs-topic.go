@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/hashgraph/hedera-sdk-go/v2"
 	"github.com/joho/godotenv"
@@ -57,7 +56,9 @@ func main() {
 		log.Fatalf("Error executing TopicCreateTransaction: %v\n", err)
 	}
 
-	topicCreateTxReceipt, err := topicCreateTxResponse.GetReceipt(client)
+	topicCreateTxReceipt, err := topicCreateTxResponse.
+		SetValidateStatus(true).
+		GetReceipt(client)
 	if err != nil {
 		log.Fatalf("Error getting receipt for TopicCreateTransaction: %v\n", err)
 	}
@@ -65,9 +66,6 @@ func main() {
 	topicCreateTxId := topicCreateTxReceipt.TransactionID
 	topicId := topicCreateTxReceipt.TopicID
 	topicExplorerUrl := fmt.Sprintf("https://hashscan.io/testnet/topic/%s", topicId)
-
-	// need to wait a few seconds for topic to register
-	time.Sleep(5 * time.Second) // Publish a message to this topic
 
 	// NOTE: Publish message to topic
 	// Step (2) in the accompanying tutorial
@@ -89,7 +87,9 @@ func main() {
 	}
 
 	topicMsgSubmitTxId := topicMsgSubmitTxResponse.TransactionID
-	topicMsgSubmitTxReceipt, err := topicMsgSubmitTxResponse.GetReceipt(client)
+	topicMsgSubmitTxReceipt, err := topicMsgSubmitTxResponse.
+		SetValidateStatus(true).
+		GetReceipt(client)
 	if err != nil {
 		log.Fatalf("Error getting receipt for TopicMessageSubmitTransaction: %v\n", err)
 	}

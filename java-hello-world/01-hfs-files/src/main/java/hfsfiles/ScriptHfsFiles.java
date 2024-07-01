@@ -38,7 +38,9 @@ public class ScriptHfsFiles {
         FileCreateTransaction fileCreateTxSigned = fileCreateTx.sign(accountKey);
         TransactionResponse fileCreateTxSubmitted = fileCreateTxSigned.execute(client);
         TransactionId fileCreateTxId = fileCreateTxSubmitted.transactionId;
-        TransactionReceipt fileCreateTxReceipt = fileCreateTxSubmitted.getReceipt(client);
+        TransactionReceipt fileCreateTxReceipt = fileCreateTxSubmitted
+            .setValidateStatus(true)
+            .getReceipt(client);
         FileId fileId = fileCreateTxReceipt.fileId;
 
         // Read file from Hedera Testnet, using HFS FileContentsQuery

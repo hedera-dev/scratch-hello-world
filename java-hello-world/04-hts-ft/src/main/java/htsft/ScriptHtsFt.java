@@ -53,7 +53,9 @@ public class ScriptHtsFt {
             .freezeWith(client);
         TokenCreateTransaction tokenCreateTxSigned = tokenCreateTx.sign(accountKey);
         TransactionResponse tokenCreateTxSubmitted = tokenCreateTxSigned.execute(client);
-        TransactionReceipt tokenCreateTxReceipt = tokenCreateTxSubmitted.getReceipt(client);
+        TransactionReceipt tokenCreateTxReceipt = tokenCreateTxSubmitted
+            .setValidateStatus(true)
+            .getReceipt(client);
         TokenId tokenId = tokenCreateTxReceipt.tokenId;
         String tokenExplorerUrl = "https://hashscan.io/testnet/token/" + tokenId;
 
